@@ -25,7 +25,17 @@ class IncubateRequestHandler(
 			return Response(200)
 		}
 
-		val body = RequestMapper.createBodyFromRequest(input!!)
+		val body =
+				try {
+					RequestMapper.createBodyFromRequest(input!!)
+				} catch (e: RuntimeException) {
+					System.err.println("Error encountered while deserializing request:" + e.message)
+					System.err.println(e.stackTrace)
+					System.err.println("Here is the body:")
+					System.err.println(input!!["body"])
+					return Response(200)
+				}
+
 		val jsonPayload = ResponseMessageCreator.generateJsonPayload(body)
 		val responseSentSuccessfully = MessageSender.sendResponse(callFactory, jsonPayload)
 		if (!responseSentSuccessfully) {

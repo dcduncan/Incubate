@@ -75,19 +75,54 @@ data class Entry(var id: String? = null, var time: Long? = null, var messaging: 
 data class MessageReceive(var sender: Sender? = null, var recipient: Recipient? = null, var timestamp: Long? = null, var message: Message? = null)
 
 /**
- * Sender for the [MessageReceive] even.
+ * Sender for the [MessageReceive] event.
  * @see <a href="https://developers.facebook.com/docs/messenger-platform/reference/webhook-events/messages">Facebook Message Api</a>
  */
 data class Sender(var id: String? = null)
 
 /**
- * Recipient for the [MessageReceive] even.
+ * Recipient for the [MessageReceive] event.
  * @see <a href="https://developers.facebook.com/docs/messenger-platform/reference/webhook-events/messages">Facebook Message Api</a>
  */
 data class Recipient(var id: String? = null)
 
 /**
- * Message for the [MessageReceive] even.
+ * Message for the [MessageReceive] event.
  * @see <a href="https://developers.facebook.com/docs/messenger-platform/reference/webhook-events/messages">Facebook Message Api</a>
  */
-data class Message(var mid: String? = null, var text: String? = null, var seq: Long? = null)
+data class Message(var mid: String? = null, var text: String? = null, var seq: Long? = null, var sticker_id: Long? = null, var attachments: Array<Attachment>? = null) {
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (javaClass != other?.javaClass) return false
+
+		other as Message
+
+		if (mid != other.mid) return false
+		if (text != other.text) return false
+		if (seq != other.seq) return false
+		if (sticker_id != other.sticker_id) return false
+		if (!Arrays.equals(attachments, other.attachments)) return false
+
+		return true
+	}
+
+	override fun hashCode(): Int {
+		var result = mid?.hashCode() ?: 0
+		result = 31 * result + (text?.hashCode() ?: 0)
+		result = 31 * result + (seq?.hashCode() ?: 0)
+		result = 31 * result + (sticker_id?.hashCode() ?: 0)
+		result = 31 * result + (attachments?.let { Arrays.hashCode(it) } ?: 0)
+		return result
+	}
+
+}
+
+/**
+ * Container for the attachments of the [Message].
+ */
+data class Attachment(var type: String? = null, var payload: Payload? = null)
+
+/**
+ * Container for the payload of the [Attachment].
+ */
+data class Payload(var url: String? = null, var sticker_id: Long? = null)
